@@ -1,4 +1,4 @@
-# api_slim3
+# Hiper Slim
 
 ```
 $ git clone https://github.com/josejailton/api_slim3.git my-project
