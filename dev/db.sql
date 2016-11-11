@@ -14,3 +14,16 @@ CREATE TABLE `products` (
     REFERENCES `categories` (`id`)
     ON DELETE RESTRICT
     ON UPDATE RESTRICT);
+
+CREATE TABLE `stocks` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `product_id` INT NOT NULL,
+  `name` VARCHAR(255) NOT NULL,
+  `quantity` FLOAT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_stock_1_idx` (`product_id` ASC),
+  CONSTRAINT `fk_stock_1`
+  FOREIGN KEY (`product_id`)
+  REFERENCES `products` (`id`)
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT);
