@@ -27,6 +27,7 @@ class Connection
      * @var array
      */
     private $clauses = [];
+
     /**
      * @var array
      */
