@@ -15,9 +15,7 @@ class ProductController extends AbstractController
     public function getProduct($id)
     {
         $data = $this->connection()
-            ->table('products')
-            ->where('id = ?')
-            ->read($id);
+            ->table('products')->where('id = ?')->read($id);
 
         $status = 200;
         if (!is_array($data)) {
