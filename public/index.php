@@ -8,7 +8,6 @@ require dirname(__DIR__) . '/vendor/autoload.php';
 $app = new \Slim\App;
 
 $app->get('/product/{id}', function (Request $request, Response $response, $parameters) {
-
 		$db_produtos = new mysqli('fdb6.awardspace.net','1685805_imoveis','jose123456','1685805_imoveis');
 		$response->withStatus(200);
 		$data_array = array();
@@ -25,9 +24,6 @@ $app->get('/product/{id}', function (Request $request, Response $response, $para
 		} else {
 			return $this->response->withJson(array('nenhum resultado'));
 		}
-});
-    
-    
-    
+ 
 });
 $app->run();
