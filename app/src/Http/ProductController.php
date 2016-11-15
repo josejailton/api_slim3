@@ -1,6 +1,7 @@
 <?php
 
 namespace Property\Http;
+use Slim\Http\Response;
 
 /**
  * Class ProductController
@@ -10,7 +11,7 @@ class ProductController extends AbstractController
 {
     /**
      * @param $id
-     * @return mixed
+     * @return Response
      */
     public function read($id = null)
     {
@@ -25,9 +26,12 @@ class ProductController extends AbstractController
         return $this->response($data, 200);
     }
 
+    /**
+     * @return Response
+     */
     public function create()
     {
-        
+        return $this->response([], 200);
     }
 
     /**
