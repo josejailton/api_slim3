@@ -12,7 +12,7 @@ class ProductController extends AbstractController
      * @param $id
      * @return mixed
      */
-    public function getProduct($id)
+    public function read($id = null)
     {
         $data = $this->connection()->table('products')->where('id = ?')->read($id);
 

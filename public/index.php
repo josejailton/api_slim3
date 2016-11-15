@@ -15,14 +15,14 @@ $app->get('/{version}/product/{id}', function (Request $request, Response $respo
 
     $controller = new ProductController($request, $response, $database);
 
-    return $controller->getProduct($parameters['id']);
+    return $controller->read($parameters['id']);
 });
 
 $app->post('/{version}/product', function (Request $request, Response $response, $parameters) use ($database) {
 
     $controller = new ProductController($request, $response, $database);
 
-    return $controller->getProduct($parameters['id']);
+    return $controller->create($parameters['id']);
 });
 
 $app->run();
