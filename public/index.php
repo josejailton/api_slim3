@@ -11,7 +11,7 @@ use Slim\Http\Response;
 
 use Property\Http\ProductController;
 
-$app->get('/product/{id}', function (Request $request, Response $response, $parameters) use ($database) {
+$app->get('/{version}/product/{id}', function (Request $request, Response $response, $parameters) use ($database) {
 
     $controller = new ProductController($request, $response, $database);
 
