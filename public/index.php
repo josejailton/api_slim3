@@ -1,10 +1,12 @@
 <?php
 
-require dirname(__DIR__) . '/vendor/autoload.php';
+define('__APP_ROOT__', dirname(__DIR__) . '/private');
 
-$app = require_once dirname(__DIR__) . '/app/bootstrap.php';
+require __APP_ROOT__ . '/vendor/autoload.php';
 
-$database = require_once dirname(__DIR__) . '/config/database.php';
+$app = require_once __APP_ROOT__ . '/app/bootstrap.php';
+
+$database = require_once __APP_ROOT__ . '/config/database.php';
 
 use Slim\Http\Request;
 use Slim\Http\Response;
