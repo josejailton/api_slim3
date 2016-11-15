@@ -25,6 +25,11 @@ class ProductController extends AbstractController
         return $this->response($data, 200);
     }
 
+    public function create()
+    {
+        
+    }
+
     /**
      * @param $data
      * @return mixed
