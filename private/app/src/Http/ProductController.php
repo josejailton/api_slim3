@@ -15,7 +15,11 @@ class ProductController extends AbstractController
      */
     public function read($id = null)
     {
-        $data = $this->connection()->table('products')->where('id = ?')->read($id);
+        //select products.id as id, brands.brand_name as brand from products INNER JOIN brands ON products.brand_id = brands.id
+        $data = $this->connection()
+            ->collection('products INNER JOIN brands ON products.brand_id = brands.id')
+            ->fields(['products.id as id', 'brands.brand_name as brand'])
+            ->where('id = ?')->read($id);
 
         if (!is_array($data)) {
             return $this->response($data, 500);
