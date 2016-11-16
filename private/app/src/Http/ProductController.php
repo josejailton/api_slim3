@@ -31,7 +31,7 @@ class ProductController extends AbstractController
      */
     public function create()
     {
-        
+
         return $this->response([], 200);
     }
 
