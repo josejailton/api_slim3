@@ -17,7 +17,7 @@ class ProductController extends AbstractController
     {
         //select products.id as id, brands.brand_name as brand from products INNER JOIN brands ON products.brand_id = brands.id
         $data = $this->connection()
-            ->collection('products INNER JOIN brands ON products.brand_id = brands.id')
+            ->collection('products INNER JOIN brands ON (products.brand_id = brands.id)')
             ->fields(['products.id as id', 'brands.brand_name as brand'])
             ->where('products.id = ?')->read($id);
 
