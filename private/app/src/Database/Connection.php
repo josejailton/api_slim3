@@ -11,7 +11,7 @@ use \PDOStatement;
  *
  * @method $this table(string $table)
  * @method $this collection(string $collection)
- * @method $this fields(array|string $fields)
+ * @method $this fields(array $fields)
  * @method $this where(array $where)
  * @method $this group(array $group)
  * @method $this order(array $order)
@@ -55,6 +55,26 @@ class Connection
     public function __call($name, $arguments)
     {
         $this->clauses[$name] = $arguments[0];
+        return $this;
+    }
+
+    /**
+     * @param string $table
+     * @param array $on
+     * @param string $join
+     * @return $this
+     */
+    public function join($table, $on = null, $join = 'INNER')
+    {
+        if (is_null($table)) {
+            unset($this->clauses['join']);
+        } else {
+            if (!isset($this->clauses['join'])) {
+                $this->clauses['join'] = [];
+            }
+            $on = implode(' = ', $on);
+            $this->clauses['join'][] = "{$join} JOIN {$table} ON ({$on})";
+        }
         return $this;
     }
 
@@ -168,32 +188,40 @@ class Connection
     public function read($parameters = null, $debug = false)
     {
         $collection = isset($this->clauses['table']) ? $this->clauses['table'] : (isset($this->clauses['collection']) ? $this->clauses['collection'] : '');
+        $join = isset($this->clauses['join']) ? $this->clauses['join'] : null;
+
         $fields = isset($this->clauses['fields']) ? $this->clauses['fields'] : '*';
         $where = isset($this->clauses['where']) ? $this->clauses['where'] : null;
         $group = isset($this->clauses['group']) ? $this->clauses['group'] : null;
         $order = isset($this->clauses['order']) ? $this->clauses['order'] : null;
         $fields = is_array($fields) ? $fields : [$fields];
+
         $parameters = is_array($parameters) ? $parameters : [$parameters];
+
         $commands = [];
         $commands[] = 'SELECT';
         $commands[] = is_array($fields) ? implode(', ', $fields) : $fields;
         $commands[] = 'FROM ' . $collection;
+        if ($join) {
+            $commands[] = implode(' ', $join);
+        }
         if ($where) {
             $where = is_array($where) ? $where : [$where];
             $commands[] = 'WHERE (' . implode(') AND (', $where) . ')';
         }
         if ($group) {
             $group = is_array($group) ? $group : [$group];
-            $commands[] = 'GROUP ' . implode(', ', $group);
+            $commands[] = 'GROUP BY ' . implode(', ', $group);
         }
         if ($order) {
             $order = is_array($order) ? $order : [$order];
-            $commands[] = 'ORDER ' . implode(', ', $order);
+            $commands[] = 'ORDER BY ' . implode(', ', $order);
         }
         $sql = implode(' ', $commands);
         if ($debug) {
             var_dump($sql);
         }
+
         return $this->fetch($sql, $parameters);
     }
 

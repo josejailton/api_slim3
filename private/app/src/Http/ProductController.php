@@ -1,6 +1,7 @@
 <?php
 
 namespace Property\Http;
+
 use Slim\Http\Response;
 
 /**
@@ -18,25 +19,19 @@ class ProductController extends AbstractController
     {
         $connection = $this->connection();
 
-        $connection->collection('products');
+        $connection
+            ->table('products')
+            ->where('products.id = ?');
 
-        switch ($behaviour) {
-            case 'brand': {
-                //select products.id as id, brands.brand_name as brand from products INNER JOIN brands ON products.brand_id = brands.id
-                $connection
-                    ->collection('products INNER JOIN brands ON (products.brand_id = brands.id)')
-                    ->fields(['products.id as id', 'brands.brand_name as brand']);
-                break;
-            }
-            case 'supplier': {
-                //select prod.id as id, supplier.supplier_name as supplier from products as prod INNER Join suppliers as supplier ON prod.supplier_id = supplier.id
-                $connection
-                    ->collection('products INNER JOIN suppliers ON (products.supplier_id = suppliers.id)')
-                    ->fields(['products.id as id', 'suppliers.supplier_name as supplier']);
-                break;
-            }
-        }
-        $data = $connection->where('products.id = ?')->read($id);
+        $data = $connection
+            ->fields([
+                'products.id AS id', 'products.name AS name',
+                'brands.id AS brand_id', 'brands.name AS brand_name',
+                'suppliers.id AS supplier_id', 'suppliers.name AS supplier_name',
+            ])
+            ->join('brands', ['products.brand_id', 'brands.id'])
+            ->join('suppliers', ['products.supplier_id', 'suppliers.id'])
+            ->read($id);
 
         if (!is_array($data)) {
             return $this->response($data, 500);
@@ -44,7 +39,35 @@ class ProductController extends AbstractController
 
         $data = $this->with($data, $id);
 
-        return $this->response($data, 200);
+        $product = $data[0];
+
+        switch ($behaviour) {
+            case 'details': {
+                $peaces = $connection
+                    ->join('prices', ['products.id', 'prices.product_id'])
+                    ->join('peaces', ['prices.peace_id', 'peaces.id'])
+                    ->join('peaces_details', ['peaces.id', 'peaces_details.peace_id'])
+                    ->join('details', ['peaces_details.detail_id', 'details.id'])
+                    ->join('variations', ['details.variation_id', 'variations.id'])
+                    ->fields([
+                            'peaces.id AS id', 'GROUP_CONCAT(details.name ORDER BY variations.order SEPARATOR " ") AS description']
+                    )
+                    ->group(['peaces.id'])
+                    ->read($id);
+
+                $connection
+                    ->join(null)
+                    ->group(null);
+
+                $categories = [];//$connection->read($id);
+
+                $product['peaces'] = $peaces;
+                $product['categories'] = $categories;
+                break;
+            }
+        }
+
+        return $this->response($product, 200);
     }
 
     /**
@@ -58,6 +81,7 @@ class ProductController extends AbstractController
 
     /**
      * @param $data
+     * @param $id
      * @return mixed
      */
     private function with($data, $id)
@@ -79,8 +103,7 @@ class ProductController extends AbstractController
     {
         switch ($with) {
             case 'stock': {
-                return $this->connection()->table('stocks')
-                    ->fields(['id', 'name', 'quantity'])->where('product_id = ?')->read($id);
+                return [];
                 break;
             }
         }
