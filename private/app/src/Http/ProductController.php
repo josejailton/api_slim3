@@ -26,9 +26,11 @@ class ProductController extends AbstractController
         $data = $connection
             ->fields([
                 'products.id AS id', 'products.name AS name',
+                'categories.id AS category_id', 'categories.name AS category_name',
                 'brands.id AS brand_id', 'brands.name AS brand_name',
                 'suppliers.id AS supplier_id', 'suppliers.name AS supplier_name',
             ])
+            ->join('categories', ['products.category_id', 'categories.id'])
             ->join('brands', ['products.brand_id', 'brands.id'])
             ->join('suppliers', ['products.supplier_id', 'suppliers.id'])
             ->read($id);
@@ -55,11 +57,15 @@ class ProductController extends AbstractController
                     ->group(['peaces.id'])
                     ->read($id);
 
-                $connection
+                $categories = $connection
+                    ->table(null)
                     ->join(null)
-                    ->group(null);
-
-                $categories = [];//$connection->read($id);
+                    ->group(null)
+                    ->fields(['parent.id AS id', 'parent.name AS name', '(@sequence := @sequence + 1) AS sequence'])
+                    ->collection('categories AS node, categories AS parent, (SELECT @sequence := 0) sequence')
+                    ->where('node._left BETWEEN parent._left AND parent._right AND node.id = ?')
+                    ->order('parent._left DESC')
+                    ->read($product['category_id']);
 
                 $product['peaces'] = $peaces;
                 $product['categories'] = $categories;
@@ -75,7 +81,6 @@ class ProductController extends AbstractController
      */
     public function create()
     {
-
         return $this->response([], 200);
     }
 
